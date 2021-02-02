@@ -1,6 +1,6 @@
 import { Client } from "../lib/Client";
 
-const client = new Client("ODA1OTg3OTQ3NjE4NzYyNzUy.YBi4xQ.4DlzKnAB2slQaDZsJ2iKC0dnbbY","771")
+const client = new Client(process.env.token,"771")
 client.connect()
 
 client.on("ready", (data) => {

@@ -3,15 +3,15 @@ import axios from "axios"
 import eventEmitter from "eventemitter3";
 import { Guilds } from "./Guilds";
 
-export class Client extends eventEmitter{
+export class Client extends eventEmitter {
     token: string
-    interval: number
-    intents: string
-    socket: ws
+    heartbeat_ms: number;
+    intents: string;
+    socket: ws;
     ready = false
     guilds = new Guilds()
 
-    constructor(token: string, intents: string="512"){
+    constructor(token: string, intents: string = "512") {
         super()
 
         this.token = token
@@ -20,15 +20,15 @@ export class Client extends eventEmitter{
     }
 
     heartbeat = (ms: number, ws: ws) => {
-        setInterval(function() {
-            ws.send(JSON.stringify({"op": 1, "d": 251}))
+        setInterval(function () {
+            ws.send(JSON.stringify({ "op": 1, "d": 251 }))
             ws.on("message", (message) => {
                 const data = JSON.parse(message.toString())
-                if (data["op"] != 11){
+                if (data["op"] != 11) {
                     return
                 }
             })
-        },this.interval)
+        }, this.heartbeat_ms)
     }
 
     connect = () => {
@@ -43,26 +43,26 @@ export class Client extends eventEmitter{
                         "$browser": "disco",
                         "$device": "disco"
                     }
-                }                
+                }
             }))
-        })
 
-        this.socket.on("message" , (message) => {
-            const data = JSON.parse(message.toString())
-
-            if (data['t'] === null && !this.ready){
-                this.interval = data.d.heartbeat_interval
-                this.heartbeat(this.interval, this.socket)
-            }
-            
-            if (data['t'] === "READY" && !this.ready){
-                this.ready = true
-            }
-
-            if (data['t'] === "GUILD_CREATE" && this.ready){
-                this.guilds.add(data.d)
-                this.emit("ready", data.d)
-            }
+            this.socket.on("message", (message) => {
+                const data = JSON.parse(message.toString())
+                if (data["t"] === null && !this.ready) {
+                    this.heartbeat_ms = data['d']['heartbeat_interval']
+                    this.heartbeat(this.heartbeat_ms, this.socket)
+                }
+    
+                if (data['t'] === "READY" && !this.ready) {
+                    this.ready = true
+                }
+    
+                if (data['t'] === "GUILD_CREATE" && this.ready) {
+                    this.guilds.add(data.d)
+                    this.emit("ready", data.d)
+                }
+            })  
+                  
         })
     }
 }

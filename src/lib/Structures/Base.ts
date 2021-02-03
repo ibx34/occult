@@ -1,6 +1,6 @@
 import util from "util"
 
-class Base {
+export class Base {
     [x: string]: any
 
     constructor(id) {
@@ -51,5 +51,3 @@ class Base {
         return json;
     }
 }
-
-module.exports = Base;

@@ -5,17 +5,12 @@ export class Member extends Base{
     [x: string]: any
 
     constructor(data,client,guild){
-        super(data.id);
-
-        for (const u of guild.members){
-            if (u.id == data.id){
-                this.user = u
-            }
-        }
+        super(data.user.id || data.id);
 
         this._client = client
         this._guild = guild
-        this.update(this.user)
+        this.user = data.user
+        this.update(data)
     }
 
     update(data){

@@ -1,10 +1,10 @@
 import util from "util"
 
 export class Base {
-    [x: string]: any
+    id: number
 
     constructor(id) {
-        if(id) {
+        if (id) {
             this.id = id;
         }
     }
@@ -15,9 +15,9 @@ export class Base {
 
     [util.inspect.custom]() {
         // http://stackoverflow.com/questions/5905492/dynamic-function-name-in-javascript
-        const copy = new {[this.constructor.name]: class {}}[this.constructor.name]();
-        for(const key in this) {
-            if(this.hasOwnProperty(key) && !key.startsWith("_") && this[key] !== undefined) {
+        const copy = new { [this.constructor.name]: class { } }[this.constructor.name]();
+        for (const key in this) {
+            if (this.hasOwnProperty(key) && !key.startsWith("_") && this[key] !== undefined) {
                 copy[key.toString()] = this[key];
             }
         }
@@ -28,23 +28,23 @@ export class Base {
         return `[${this.constructor.name} ${this.id}]`;
     }
 
-    toJSON(props = []) {
+    toJSON(props = []): {} {
         const json = {};
-        if(this.id) {
+        if (this.id) {
             json['id'] = this.id;
         }
-        for(const prop of props) {
+        for (const prop of props) {
             const value = this[prop];
             const type = typeof value;
-            if(value === undefined) {
+            if (value === undefined) {
                 continue;
-            } else if(type !== "object" && type !== "function" || value === null) {
+            } else if (type !== "object" && type !== "function" || value === null) {
                 json[prop] = value;
-            } else if(value.toJSON !== undefined) {
+            } else if (value.toJSON !== undefined) {
                 json[prop] = value.toJSON();
-            } else if(value.values !== undefined) {
+            } else if (value.values !== undefined) {
                 json[prop] = [...value.values()];
-            } else if(type === "object") {
+            } else if (type === "object") {
                 json[prop] = value;
             }
         }

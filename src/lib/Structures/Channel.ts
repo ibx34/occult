@@ -2,6 +2,8 @@ import { Base } from "./Base";
 import { CategoryChannel } from "./CategoryChannel";
 
 export class Channel extends Base{
+    [x: string]: any
+    
     constructor(data, client){
         super(data.id)
         this._client = client

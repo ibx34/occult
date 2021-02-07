@@ -3,6 +3,7 @@ import { TextChannel } from "./TextChannel";
 import { User } from "./User";
 import { Guild } from "./Guild";
 import { Member } from "./Member";
+import { MessageMentions } from "./MessageMentiosn";
 
 export class Message extends Base{
     [x: string]: any
@@ -27,14 +28,19 @@ export class Message extends Base{
         if (data.guild_id !== undefined){
             if (data.channel_id !== undefined){
                 for (const channel of this._guild.channels){
+                    //console.log(channel)
                     if (channel.id == data.channel_id){
                         this.channel = new TextChannel(channel,this._client)
                     }
                 }
             }
         }
-        if (data.member !== undefined && data.guild_id !== undefined){
-            this.member = new Member(data.author,this._client,this._guild)
+        if (data.member !== undefined){
+            data.member['user'] = data.author
+            this.member = new Member(data.member,this._client,this._guild)
+        }
+        if (data.mentions !== undefined){
+            this.mentions = new MessageMentions(data.mentions,this._client,this._guild)
         } 
     }
 }
